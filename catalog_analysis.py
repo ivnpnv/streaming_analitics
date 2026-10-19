@@ -248,25 +248,38 @@ above_average_ratings = {
 }
 
 
-for movie in movies:
-    if "comedy" in movie["genres"]:
-        continue
-    print(movie["title"])
-
-index = 0
-
-while index < len(movies):
-    if movies[index]["rating"] > 9.0:
-        print(movies[index]["title"])
-        break
-    index += 1
-else:
-    print("Шедевров не найдено")
-
-
-for movie in iter_high_rated(movies):
-    print(format_report_line(movie))
-
 total_duration = sum(
     movie["duration_min"] for movie in movies if movie["rating"] > 7
 )
+
+
+def build_report(movies):
+    average = average_rating(movies)
+    average_age = catalog_age_stats(movies)[2]
+
+    print("ОТЧЕТ ПО КАТАЛОГУ")
+    print(f"Средний рейтинг: {average}")
+    print(f"Средний возраст фильмов: {average_age} лет")
+
+    print()
+    print("Топ-3 фильма:")
+    sorted_movies = sorted(movies, key=lambda movie: movie["rating"], reverse=True)
+    for movie in sorted_movies[:3]:
+        print(f"  {format_report_line(movie)}")
+
+    print()
+    print("Фильмов по жанрам:")
+    genre_counts = count_by_genre(movies)
+    sorted_genres = sorted(
+        genre_counts, key=lambda genre: (-genre_counts[genre], genre)
+    )
+    for genre in sorted_genres:
+        print(f"  {genre} — {genre_counts[genre]}")
+
+    print()
+    genres = ", ".join(sorted(all_genres(movies)))
+    print(f"Все жанры каталога: {genres}")
+
+
+if __name__ == "__main__":
+    build_report(movies)
